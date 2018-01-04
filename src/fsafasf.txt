@@ -1,0 +1,63 @@
+
+/*
+		if(!data_received){
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);
+			HAL_SPI_Receive_IT(&spi, adcAdatok, 64);
+			while(data_received);
+		}
+		data_received = 0;
+*/
+
+//		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_RESET);
+//		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_6);
+//		delay_is_elapsed = 0;
+//		delay_x_time();
+//		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_6);
+//		HAL_Delay(1);
+
+//		HAL_Delay(5);
+/*
+        atmeneti0 = receive[0];
+        atmeneti1 = receive[1];
+        atmeneti2 = receive[2];
+        atmeneti3 = receive[3];
+        receive[0] = atmeneti1;
+        receive[1] = atmeneti2;
+        receive[2] = atmeneti3;
+        receive[3] = atmeneti0;
+
+ */
+
+/*
+        szam = (float*) receive;
+
+ //       szam = (float*)chptr;
+        p = *szam;
+*/
+
+		szumma_adc_values = 0;
+		szumma_sulyozott = 0;
+		adcAdatok[31] = adcAdatok[30];
+		adcAdatok[0] = adcAdatok[1];
+		for(int i = 0; i < 32; i++)				//arányos tényező számí  tása
+		{
+			szumma_adc_values += adcAdatok[i];
+			adcAdatok_sulyozott[i] = adcAdatok[i] * sorszam[i];			//súlyozás
+			szumma_sulyozott += adcAdatok_sulyozott[i];
+		}
+		p = (float)szumma_sulyozott/szumma_adc_values;
+
+
+
+
+		error = p-setValue;
+
+		D = error-prev_error;
+		pd_value = KP*p + KD*D;
+//			pd_value = KP*p;
+		szervo_value = DIGIT_SZ_KOZEP + (int16_t)pd_value;
+
+		prev_error = error;
+
+		/**** Védelem van a függvényben a túlvezérlés ellen *********/
+		set_compare_value_digit_szervo(szervo_value);
